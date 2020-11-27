@@ -10,7 +10,10 @@ import random
 import time
 import traceback
 
-web = 'https://www.shop-test-1.elasticbeanstalk.com'
+# web = 'https://www.shop-test-1.elasticbeanstalk.com'
+
+
+web = 'https://chicme.xyz'
 
 
 class Se_chicme():
@@ -21,6 +24,7 @@ class Se_chicme():
     web = web
 
     def __init__(self, headless=False, msite=False, init=True):
+        print('bcd')
         if not init:
             return
         option = webdriver.ChromeOptions()
@@ -136,6 +140,9 @@ class Se_chicme():
             # if not haveCache:
             #     self.longwait.until(EC.element_to_be_clickable((By.XPATH, xp_checkout_ms)))
             #     self.wd.find_element_by_xpath(xp_checkout_ms).click()
+
+    def add_chart_page(self):
+        pass
 
     def pay_paypal(self, wd=wd, wait=wait, longwait=longwait):
         print("pay_paypal:paypal支付")
@@ -289,6 +296,82 @@ class Se_chicme():
         if self.msite:
             self.wd.execute_script("arguments[0].click();", self.wd.find_element_by_xpath(xp_submit_ms))
 
+    def select_coupon(self, coupon_index=0):
+        coupons_num = [3, 5]
+        xp_select = '//div[@class="__select"]'
+        xp_use = '//div[@class="__use"]'
+        xp_coupons = '/html/body/div[2]/div/div[2]/div[2]/div[2]/div[2]/ul/li'
+        xp_usenow = './div/div[2]/span'
+        xp_input = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div/div[2]/div[2]/div/div/div/li[1]/div/div[2]/div/div[4]/div/input'
+        xp_input_ms = '//*[@id="root"]/div/div[1]/div[2]/div[2]/div/div[3]/div/div/li/div/div[3]/div/div[3]/div[1]/input'
+
+        item_nums = 1
+
+        xp_select_ms = '//a[@href="/cart/coupons"]'
+        xp_coupons_ms = '/html/body/div[2]/div/div[6]/div/div/div[2]/ul/li'
+
+        if not self.msite:
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_select)))
+            item_nums = self.wd.find_element_by_xpath(xp_input).get_attribute('value')
+            self.qty_items(coupons_num[coupon_index] - int(item_nums))
+
+            # self.wd.find_element_by_xpath(xp_select).click()
+            # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_use)))
+
+            # coupons = self.wd.find_elements_by_xpath(xp_coupons)
+            # coupons[coupon_index].find_element_by_xpath(xp_usenow).click()
+            self.screen_shot('coupon' + str(coupon_index))
+
+        else:
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_select_ms)))
+            item_nums = self.wd.find_element_by_xpath(xp_input_ms).get_attribute('value')
+            self.qty_items(coupons_num[coupon_index] - int(item_nums))
+
+            # self.wd.execute_script("arguments[0].click();", self.wd.find_element_by_xpath(xp_select_ms))
+            # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_use)))
+
+            # coupons = self.wd.find_elements_by_xpath(xp_coupons_ms)
+            # self.wd.execute_script("arguments[0].click();", coupons[coupon_index].find_element_by_xpath(xp_usenow))
+            self.screen_shot('coupon' + str(coupon_index) + '_ms')
+
+        if coupon_index < len(coupons_num) - 1:
+            self.select_coupon(coupon_index + 1)
+
+    def qty_items(self, times):
+        xp_add = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div/div[2]/div[2]/div/div/div/li[1]/div/div[2]/div/div[4]/div/span[2]'
+        xp_minus = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div/div[2]/div[2]/div/div/div/li[1]/div/div[2]/div/div[4]/div/span[1]'
+        xp_add_ms = '//*[@id="root"]/div/div[1]/div[2]/div[2]/div/div[3]/div/div/li/div/div[3]/div/div[3]/div[1]/span[2]'
+        xp_minus_ms = '//*[@id="root"]/div/div[1]/div[2]/div[2]/div/div[3]/div/div/li/div/div[3]/div/div[3]/div[1]/span[1]'
+
+        if not self.msite:
+            xp_op = xp_add
+            if times < 0:
+                xp_op = xp_minus
+        else:
+            xp_op = xp_add_ms
+            if times < 0:
+                xp_op = xp_minus_ms
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_op)))
+        for i in range(times):
+            self.wd.find_element_by_xpath(xp_op).click()
+            time.sleep(0.5)
+
+    def t(self):
+        xp_usenow = '//div[text()="Use Now"]'
+        xp_coupons = '//*[@id="root"]/div/div[2]/div[2]/div[2]/div[2]/ul/li'
+
+        # coupons = self.wd.find_elements_by_xpath(xp_coupons)
+        #
+        # coupons.find_element_by_xpath(xp_usenow)[0].click()
+
+    def screen_shot(self, name):
+        width = self.wd.execute_script("return document.documentElement.scrollWidth")
+        height = self.wd.execute_script("return document.documentElement.scrollHeight")
+        self.wd.set_window_size(width, height)
+        time.sleep(1)
+        self.wd.save_screenshot(name + '.png')
+
     def enter_login(self):
         print('enter_login:跳转登录界面')
         self.__pop_up_index()
@@ -308,7 +391,8 @@ class Se_chicme():
         self.wd.get(self.web)
         self.__pop_up_index()
 
-        self.longwait.until(EC.element_to_be_clickable((By.XPATH, xp_banner)))
+        # if self.msite:
+        #     self.longwait.until(EC.element_to_be_clickable((By.XPATH, xp_banner)))
 
     def __pop_up0(self):
         cs_continue = 'div[class="msclose __continue"]'
@@ -357,23 +441,24 @@ def gen_email_password():
 
 
 def test_main(email, password):
-    try:
-        test_main_1(ms=True)
-    except Exception:
-        print('test_main_1 fail')
-        traceback.print_exc()
-
     # try:
-    #     test_main_2(email,password)
+    #     test_main_1(ms=False)
     # except Exception:
-    #     print('test_main_2 fail')
+    #     print('test_main_1 fail')
     #     traceback.print_exc()
+
+    try:
+        test_main_2(email, password, ms=False)
+    except Exception:
+        print('test_main_2 fail')
+        traceback.print_exc()
 
 
 def test_main_1(ms=False):
     chicme = Se_chicme(msite=ms)
     chicme.add_chart()
     chicme.fill_address()
+    chicme.select_coupon()
     chicme.pay_paypal()
     chicme.wd.save_screenshot('test1.1.png')
 
@@ -392,13 +477,13 @@ def test_main_1(ms=False):
     chicme2.wd.save_screenshot('test1.3.png')
 
 
-def test_main_2(email, password):
-    chicme = Se_chicme()
+def test_main_2(email, password, ms):
+    chicme = Se_chicme(msite=ms)
     chicme.enter_login()
     chicme.regist(email, password, 'a', 'b')
-    chicme.logout()
-    chicme.enter_login()
-    chicme.login(email, password)
+    # chicme.logout()
+    # chicme.enter_login()
+    # chicme.login(email, password)
     chicme.add_chart()
     chicme.fill_address()
     chicme.pay_paypal()
