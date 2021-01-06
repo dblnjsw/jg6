@@ -21,15 +21,19 @@ class Se_chicme():
     wait = None
     longwait = None
     msite = False
+    headless = False
     web = web
 
-    def __init__(self, headless=False, msite=False, init=True):
-        print('bcd')
-        if not init:
+    def __init__(self, headless=False, msite=False, driver=None):
+        if driver:
+            self.wd = driver
+            self.wait = WebDriverWait(self.wd, 10)
+            self.longwait = WebDriverWait(self.wd, 30)
             return
         option = webdriver.ChromeOptions()
         self.msite = msite
-        if headless:
+        self.headless = headless
+        if self.headless:
             option.add_argument('--headless')
         if self.msite:
             mobileEmulation = {'deviceName': 'iPhone X'}
@@ -358,12 +362,11 @@ class Se_chicme():
             time.sleep(0.5)
 
     def t(self):
-        xp_usenow = '//div[text()="Use Now"]'
-        xp_coupons = '//*[@id="root"]/div/div[2]/div[2]/div[2]/div[2]/ul/li'
+        # self.wd.get('https://www.baidu.com')
+        self.wd.get('https://www.google.com')
 
-        # coupons = self.wd.find_elements_by_xpath(xp_coupons)
-        #
-        # coupons.find_element_by_xpath(xp_usenow)[0].click()
+
+
 
     def screen_shot(self, name):
         width = self.wd.execute_script("return document.documentElement.scrollWidth")
