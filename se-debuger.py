@@ -7,13 +7,25 @@ from tkinter import messagebox
 import json
 import os
 from importlib import reload
+import atexit
+import inspect
+import types
 
 ch_group = {}
 sections = []
 map_section_name_button = {}
 map_section_name_value = {}
+map_function_name_button = {}
 names = locals()
 csection = None
+
+
+@atexit.register
+def exit():
+    print('exit')
+    with open('se-records.txt', 'w', encoding='UTF-8') as f:
+        js = json.dumps(map_section_name_value)
+        f.write(js)
 
 
 class Execer():
@@ -36,7 +48,9 @@ class Execer():
                 exec(l)
         # print(lines)
 
+
 execer = Execer()
+
 
 def b_run():
     global execer
@@ -69,6 +83,11 @@ def b_section(name):
     csection = name
     textarea.delete('1.0', tk.END)
     textarea.insert(tk.END, map_section_name_value[name])
+
+
+def b_function(name):
+    textarea.delete('1.0', tk.END)
+    textarea.insert(tk.END, 'chicme.' + name + '()')
 
 
 def b_save():
@@ -124,22 +143,21 @@ textarea.pack(fill=tk.Y, side=tk.RIGHT)
 
 # sections
 lf_sections = tk.LabelFrame(win, text='sections')
-b_new_section = tk.Button(lf_sections, text='new', command=b_new)
-b_delete_section = tk.Button(lf_sections, text='delete', command=b_delete)
+lf_sections_action = tk.LabelFrame(lf_sections, text='action')
+b_new_section = tk.Button(lf_sections_action, text='new', command=b_new)
+b_delete_section = tk.Button(lf_sections_action, text='delete', command=b_delete)
 b_new_name = tk.Entry(lf_sections)
 
 lf_sections.pack(side=tk.LEFT, fill=tk.Y)
 b_new_name.pack()
+lf_sections_action.pack()
 
 # functions
 lf_functions = tk.LabelFrame(win, text='functions')
 lf_functions.pack(side=tk.LEFT, fill=tk.Y)
-b_f0 = tk.Button(lf_functions, text='f0')
 
-b_new_section.pack()
-b_delete_section.pack()
-
-b_f0.pack()
+b_new_section.pack(side=tk.LEFT)
+b_delete_section.pack(side=tk.RIGHT)
 
 # init
 if os.path.exists('se-records.txt'):
@@ -150,5 +168,11 @@ if os.path.exists('se-records.txt'):
         b = tk.Button(lf_sections, text=e, command=partial(b_section, e))
         b.pack()
         map_section_name_button[e] = b
+
+    for item, t in inspect.getmembers(se_chicme.Se_chicme):
+        if type(t) is types.FunctionType and not item.startswith('_'):
+            b = tk.Button(lf_functions, text=item, command=partial(b_function, item))
+            b.pack()
+            map_function_name_button[item] = b
 
 win.mainloop()
