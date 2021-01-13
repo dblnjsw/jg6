@@ -10,6 +10,7 @@ from importlib import reload
 import atexit
 import inspect
 import types
+from time import sleep
 
 ch_group = {}
 sections = []
@@ -32,6 +33,7 @@ class Execer():
     scope = {}
 
     def ex(self, lines):
+        print('section start:'+lines)
         lines = lines.split('\n')
         global names
         for l in lines:
@@ -46,6 +48,9 @@ class Execer():
                 ch_group[ls[0]] = names[ls[0]]
             else:
                 exec(l)
+
+        print('section over:'+lines)
+
         # print(lines)
 
 
@@ -63,6 +68,7 @@ def b_new():
     name = b_new_name.get()
     if name in map_section_name_button:
         raise AssertionError('命名重复')
+    b_new_name.delete(0, tk.END)
     b_s = tk.Button(lf_sections, text=name, command=partial(b_section, name))
     b_s.pack()
     win.update()
@@ -101,6 +107,8 @@ def b_reload():
         c = se_chicme.Se_chicme(driver=c_replaced.wd, headless=c_replaced.headless, msite=c_replaced.msite)
         names[e] = c
         ch_group[e] = c
+    messagebox.showinfo(message='reload suceess')
+
 
 
 def on_closing():
@@ -110,6 +118,12 @@ def on_closing():
             f.write(js)
         win.destroy()
 
+def key_ctrl_z(event):
+    textarea.edit_undo()
+def callback(event):
+    textarea.edit_separator()
+def key_enter(event):
+    b_new()
 
 changeFlag = False
 # c=Se_chicme()
@@ -122,20 +136,22 @@ win.protocol("WM_DELETE_WINDOW", on_closing)
 # out
 lf_out = tk.LabelFrame(win)
 lf_out.pack(side=tk.RIGHT, fill=tk.Y)
-l_out_current_seciton_text = tk.Label(lf_out, text='current section:')
-l_out_current_seciton = tk.Label(lf_out)
+# l_out_current_seciton_text = tk.Label(lf_out, text='current section:')
+# l_out_current_seciton = tk.Label(lf_out)
 
 b = tk.Button(lf_out, text='run', command=b_run)
 b_out_save = tk.Button(lf_out, text='save', command=b_save)
 b_out_reload = tk.Button(lf_out, text='reload', command=b_reload)
-l_out_current_seciton_text.pack()
-l_out_current_seciton.pack()
+# l_out_current_seciton_text.pack()
+# l_out_current_seciton.pack()
 
 b_out_save.pack()
 b_out_reload.pack()
 b.pack()
 
-textarea = tk.Text(lf_out)
+textarea = tk.Text(lf_out,undo=True,autoseparators=False)
+textarea.bind('<Control-z>',key_ctrl_z)
+textarea.bind('<Key>',callback)
 vscroll = tk.Scrollbar(lf_out, orient=tk.VERTICAL, command=textarea.yview)
 textarea['yscroll'] = vscroll.set
 vscroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -147,6 +163,7 @@ lf_sections_action = tk.LabelFrame(lf_sections, text='action')
 b_new_section = tk.Button(lf_sections_action, text='new', command=b_new)
 b_delete_section = tk.Button(lf_sections_action, text='delete', command=b_delete)
 b_new_name = tk.Entry(lf_sections)
+b_new_name.bind('<Return>',key_enter)
 
 lf_sections.pack(side=tk.LEFT, fill=tk.Y)
 b_new_name.pack()
