@@ -33,7 +33,7 @@ class Execer():
     scope = {}
 
     def ex(self, lines):
-        print('section start:'+lines)
+        print('section start:\n'+str(lines))
         lines = lines.split('\n')
         global names
         for l in lines:
@@ -49,7 +49,7 @@ class Execer():
             else:
                 exec(l)
 
-        print('section over:'+lines)
+        print('section over:\n'+str(lines))
 
         # print(lines)
 
@@ -102,6 +102,7 @@ def b_save():
 
 def b_reload():
     reload(se_chicme)
+    reload_functions()
     for e in ch_group:
         c_replaced = ch_group[e]
         c = se_chicme.Se_chicme(driver=c_replaced.wd, headless=c_replaced.headless, msite=c_replaced.msite)
@@ -124,6 +125,16 @@ def callback(event):
     textarea.edit_separator()
 def key_enter(event):
     b_new()
+
+def reload_functions():
+    for b in map_function_name_button:
+        map_function_name_button[b].destroy()
+    for item, t in inspect.getmembers(se_chicme.Se_chicme):
+        if type(t) is types.FunctionType and not item.startswith('_'):
+            b = tk.Button(lf_functions, text=item, command=partial(b_function, item))
+            b.pack()
+            map_function_name_button[item] = b
+    win.update()
 
 changeFlag = False
 # c=Se_chicme()
@@ -186,10 +197,6 @@ if os.path.exists('se-records.txt'):
         b.pack()
         map_section_name_button[e] = b
 
-    for item, t in inspect.getmembers(se_chicme.Se_chicme):
-        if type(t) is types.FunctionType and not item.startswith('_'):
-            b = tk.Button(lf_functions, text=item, command=partial(b_function, item))
-            b.pack()
-            map_function_name_button[item] = b
+reload_functions()
 
 win.mainloop()

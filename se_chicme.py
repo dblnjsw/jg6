@@ -13,7 +13,7 @@ import traceback
 # web = 'https://www.shop-test-1.elasticbeanstalk.com'
 
 
-web = 'https://chicme.xyz'
+web = 'https://chicme.com'
 
 
 class Se_chicme():
@@ -165,9 +165,6 @@ class Se_chicme():
             # if not haveCache:
             #     self.longwait.until(EC.element_to_be_clickable((By.XPATH, xp_checkout_ms)))
             #     self.wd.find_element_by_xpath(xp_checkout_ms).click()
-
-    def add_chart_page(self):
-        pass
 
     def pay_paypal(self, wd=wd, wait=wait, longwait=longwait):
         print("pay_paypal:paypal支付")
@@ -408,7 +405,10 @@ class Se_chicme():
 
     def t(self):
         # self.wd.get('https://www.baidu.com')
-        self.wd.get('https://www.google.com')
+        # self.wd.get('https://www.google.com')
+
+        # self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="filter-products"]/div[1]/figure/a/div/div[2]')))
+        pass
 
 
 
@@ -476,6 +476,123 @@ class Se_chicme():
             self.wd.find_element_by_css_selector(cs_cls).click()
         except:
             print('未完成支付')
+
+    def enter_item_detail(self):
+        cs_items = '.carousel.slide.__slider_body > div.carousel-inner > div.row.item.active > div:nth-child(1) > a'
+        xp_all='//*[@id="ninimour-black-friday"]/div[2]/ul/li[1]'
+        ActionChains(self.wd).move_to_element(self.wd.find_element_by_xpath(xp_all)).perform()
+        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_items)))
+        self.wd.find_element_by_css_selector(cs_items).click()
+
+    def enter_item_pop(self):
+        xp_trending='//a[@data-type="Trending Now"]'
+        xp_item='//*[@id="filter-products"]/div[1]/figure/a/div/img'
+        xp_addchart='//*[@id="filter-products"]/div[1]/figure/a/div/div[2]'
+        
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_trending)))
+        self.wd.find_element_by_xpath(xp_trending).click()
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_item)))
+        item = self.wd.find_element_by_xpath(xp_item)
+        ActionChains(self.wd).move_to_element(item).perform()
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_addchart)))
+        self.wd.find_element_by_xpath(xp_addchart).click()
+
+    def shot_select_item_attr_pop(self):
+        cs_colors = 'ul.p-colors li'
+        cs_sizes = 'ul.p-sizes > li'
+        cs_addchart='span.x-product-buy'
+
+        self.longwait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_colors)))
+        colors = self.wd.find_elements_by_css_selector(cs_colors)
+        if len(colors) > 1:
+            colors[1].click()
+        else:
+            colors[0].click()
+        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_sizes)))
+        sizes = self.wd.find_elements_by_css_selector(cs_sizes)
+        if len(sizes) > 1:
+            sizes[1].click()
+        else:
+            sizes[0].click()
+            
+        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,cs_addchart)))
+        self.wd.find_element_by_css_selector(cs_addchart).click()
+
+    def shot_select_item_attr_detail(self):
+        cs_colors = 'ul.xp-colors li'
+        cs_sizes = 'ul#sizes > li'
+
+        self.longwait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_colors)))
+        colors = self.wd.find_elements_by_css_selector(cs_colors)
+        if len(colors) > 1:
+            colors[1].click()
+        else:
+            colors[0].click()
+        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_sizes)))
+        sizes = self.wd.find_elements_by_css_selector(cs_sizes)
+        if len(sizes) > 1:
+            sizes[1].click()
+        else:
+            sizes[0].click()
+
+    def enter_cart(self):
+        self.wd.get(web+'/cart')
+
+    def shots_select_item_describe(self):
+        cs_describe='div.xp-description'
+        xp_model_button='//*[@id="htabheaders"]/li[1]'
+        xp_model='//*[@id="hmodel"]/div'
+        xp_shipping_button='//*[@id="htabheaders"]/li[3]'
+        xp_shipping='//*[@id="hshipping"]/div'
+        xp_policy_button='//*[@id="htabheaders"]/li[4]'
+        xp_policy='//*[@id="hreturnpolicy"]/div'
+
+        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,cs_describe)))
+        d=self.wd.find_element_by_css_selector(cs_describe)
+        d.screenshot('item_describe.png')
+        
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_model_button)))
+        self.wd.find_element_by_xpath(xp_model_button).click()
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_model)))
+        d = self.wd.find_element_by_xpath(xp_model)
+        d.screenshot('item_model.png')
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_shipping_button)))
+        self.wd.find_element_by_xpath(xp_shipping_button).click()
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_shipping)))
+        d = self.wd.find_element_by_xpath(xp_shipping)
+        d.screenshot('item_shipping.png')
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_policy_button)))
+        self.wd.find_element_by_xpath(xp_policy_button).click()
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_policy)))
+        d = self.wd.find_element_by_xpath(xp_policy)
+        d.screenshot('item_policy.png')
+
+    def shot_edit_address(self):
+        xp_edit='//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div/address/div[2]/span[2]/span[2]/span'
+        xp_input='//input[@name="unit"]'
+        xp_save='//button[text()="Save"]'
+        xp_address='//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div'
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_edit)))
+        self.wd.find_element_by_xpath(xp_edit).click()
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_input)))
+        self.wd.find_element_by_xpath(xp_input).send_keys('EEEEEEEEEE')
+        
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_save)))
+        self.wd.find_element_by_xpath(xp_save).click()
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_edit)))
+        self.wd.find_element_by_xpath(xp_address).screenshot('address.png')
+
+    def shot_select_coupon_sum_price(self):
+        js = "var q=document.documentElement.scrollTop=100000"
+        self.wd.execute_script(js)
+
 
 
 def gen_email_password():
