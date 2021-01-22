@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 import random
 import time
+import math
 import traceback
 
 # web = 'https://www.shop-test-1.elasticbeanstalk.com'
@@ -126,7 +127,7 @@ class Se_chicme():
                 colors[1].click()
             else:
                 colors[0].click()
-            self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,cs_sizes)))
+            self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_sizes)))
             sizes = self.wd.find_elements_by_css_selector(cs_sizes)
             if len(sizes) > 1:
                 sizes[1].click()
@@ -243,7 +244,6 @@ class Se_chicme():
             self.afterpay()
             self.screen_shot('paypal_msite')
 
-
     def pay_creditcard(self, cardname, haveCache=False):
         """
 
@@ -302,7 +302,6 @@ class Se_chicme():
 
             self.screen_shot('creditcard_msite')
 
-
     def fill_address(self):
         """
         填写购物车页下的地址具体信息
@@ -310,6 +309,7 @@ class Se_chicme():
         """
         print("fill_address:填写个人信息")
         (email, password) = gen_email_password()
+        xp_checkout = '//div[text()="Proceed to Checkout"]'
         xp_email = '//input[@name="email"]'
         xp_name = '//input[@name="name"]'
         xp_streetaddress = '//input[@name="streetAddress1"]'
@@ -319,6 +319,9 @@ class Se_chicme():
         xp_state = '//select[@name="state"]'
         xp_submit_ms = '//button[text()="Submit"]'
         xp_confirm = '//button[text()="Confirm"]'
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_checkout)))
+        self.wd.find_element_by_xpath(xp_checkout).click()
 
         self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_email)))
 
@@ -335,7 +338,7 @@ class Se_chicme():
         if self.msite:
             self.wd.execute_script("arguments[0].click();", self.wd.find_element_by_xpath(xp_submit_ms))
         else:
-            self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_confirm)))
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_confirm)))
             self.wd.find_element_by_xpath(xp_confirm).click()
 
     def select_coupon(self, coupon_index=0):
@@ -380,8 +383,8 @@ class Se_chicme():
             self.select_coupon(coupon_index + 1)
 
     def qty_items(self, times):
-        xp_add = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[3]/div/div/div/li/div/div[2]/div/div[4]/div/span[2]'
-        xp_minus = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[3]/div/div/div/li/div/div[2]/div/div[4]/div/span[1]'
+        xp_add = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[4]/div/span[2]'
+        xp_minus = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[4]/div/span[1]'
         xp_add_ms = '//*[@id="root"]/div/div[1]/div[2]/div[2]/div/div[3]/div/div/li/div/div[3]/div/div[3]/div[1]/span[2]'
         xp_minus_ms = '//*[@id="root"]/div/div[1]/div[2]/div[2]/div/div[3]/div/div/li/div/div[3]/div/div[3]/div[1]/span[1]'
 
@@ -410,16 +413,16 @@ class Se_chicme():
         # self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="filter-products"]/div[1]/figure/a/div/div[2]')))
         pass
 
-
-
-
-    def screen_shot(self, name):
+    def screen_shot(self, element, name):
         # width = self.wd.execute_script("return document.documentElement.scrollWidth")
         # height = self.wd.execute_script("return document.documentElement.scrollHeight")
         # self.wd.maximize_window()
         time.sleep(1)
-        self.wd.save_screenshot(name + '.png')
-        print('图片已保存：'+ name + '.png')
+        if isinstance(element,webdriver.Chrome):
+            element.save_screenshot(name + '.png')
+        else:
+            element.screenshot(name + '.png')
+        print('图片已保存：' + name + '.png')
 
     def enter_login(self):
         print('enter_login:跳转登录界面')
@@ -478,31 +481,35 @@ class Se_chicme():
             print('未完成支付')
 
     def enter_item_detail(self):
-        cs_items = '.carousel.slide.__slider_body > div.carousel-inner > div.row.item.active > div:nth-child(1) > a'
-        xp_all='//*[@id="ninimour-black-friday"]/div[2]/ul/li[1]'
-        ActionChains(self.wd).move_to_element(self.wd.find_element_by_xpath(xp_all)).perform()
-        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_items)))
-        self.wd.find_element_by_css_selector(cs_items).click()
-
-    def enter_item_pop(self):
-        xp_trending='//a[@data-type="Trending Now"]'
-        xp_item='//*[@id="filter-products"]/div[1]/figure/a/div/img'
-        xp_addchart='//*[@id="filter-products"]/div[1]/figure/a/div/div[2]'
+        xp_trending = '//a[@data-type="Trending Now"]'
+        xp_item = '//*[@id="filter-products"]/div[1]/figure/a/div/img'
         
         self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_trending)))
         self.wd.find_element_by_xpath(xp_trending).click()
-
+        
         self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_item)))
+        self.wd.find_element_by_xpath(xp_item).click()
+
+    def enter_item_pop(self):
+        xp_trending = '//a[@data-type="Trending Now"]'
+        xp_item = '//*[@id="filter-products"]/div[1]/figure/a/div/img'
+        xp_addchart = '//*[@id="filter-products"]/div[1]/figure/a/div/div[2]'
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_trending)))
+        self.wd.find_element_by_xpath(xp_trending).click()
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_item)))
+        self.wd.execute_script("window.scrollTo(0,100)")
         item = self.wd.find_element_by_xpath(xp_item)
         ActionChains(self.wd).move_to_element(item).perform()
 
-        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_addchart)))
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_addchart)))
         self.wd.find_element_by_xpath(xp_addchart).click()
 
-    def shot_select_item_attr_pop(self):
+    def select_item_attr_pop(self):
         cs_colors = 'ul.p-colors li'
         cs_sizes = 'ul.p-sizes > li'
-        cs_addchart='span.x-product-buy'
+        cs_addchart = 'span.x-product-buy'
 
         self.longwait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_colors)))
         colors = self.wd.find_elements_by_css_selector(cs_colors)
@@ -516,11 +523,13 @@ class Se_chicme():
             sizes[1].click()
         else:
             sizes[0].click()
-            
-        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,cs_addchart)))
+
+        self.screen_shot(self.wd, "item")
+
+        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_addchart)))
         self.wd.find_element_by_css_selector(cs_addchart).click()
 
-    def shot_select_item_attr_detail(self):
+    def select_item_attr_detail(self):
         cs_colors = 'ul.xp-colors li'
         cs_sizes = 'ul#sizes > li'
 
@@ -538,22 +547,22 @@ class Se_chicme():
             sizes[0].click()
 
     def enter_cart(self):
-        self.wd.get(web+'/cart')
+        self.wd.get(web + '/cart')
 
     def shots_select_item_describe(self):
-        cs_describe='div.xp-description'
-        xp_model_button='//*[@id="htabheaders"]/li[1]'
-        xp_model='//*[@id="hmodel"]/div'
-        xp_shipping_button='//*[@id="htabheaders"]/li[3]'
-        xp_shipping='//*[@id="hshipping"]/div'
-        xp_policy_button='//*[@id="htabheaders"]/li[4]'
-        xp_policy='//*[@id="hreturnpolicy"]/div'
+        cs_describe = 'div.xp-description'
+        xp_model_button = '//*[@id="htabheaders"]/li[1]'
+        xp_model = '//*[@id="hmodel"]/div'
+        xp_shipping_button = '//*[@id="htabheaders"]/li[3]'
+        xp_shipping = '//*[@id="hshipping"]/div'
+        xp_policy_button = '//*[@id="htabheaders"]/li[4]'
+        xp_policy = '//*[@id="hreturnpolicy"]/div'
 
-        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,cs_describe)))
-        d=self.wd.find_element_by_css_selector(cs_describe)
+        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_describe)))
+        d = self.wd.find_element_by_css_selector(cs_describe)
         d.screenshot('item_describe.png')
-        
-        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_model_button)))
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_model_button)))
         self.wd.find_element_by_xpath(xp_model_button).click()
         self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_model)))
         d = self.wd.find_element_by_xpath(xp_model)
@@ -572,27 +581,40 @@ class Se_chicme():
         d.screenshot('item_policy.png')
 
     def shot_edit_address(self):
-        xp_edit='//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div/address/div[2]/span[2]/span[2]/span'
-        xp_input='//input[@name="unit"]'
-        xp_save='//button[text()="Save"]'
-        xp_address='//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div'
+        xp_edit = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div/address/div[2]/span[2]/span[2]/span'
+        xp_input = '//input[@name="unit"]'
+        xp_save = '//button[text()="Save"]'
+        xp_address = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div'
 
-        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_edit)))
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_edit)))
         self.wd.find_element_by_xpath(xp_edit).click()
 
-        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_input)))
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_input)))
         self.wd.find_element_by_xpath(xp_input).send_keys('EEEEEEEEEE')
-        
-        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_save)))
+
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_save)))
         self.wd.find_element_by_xpath(xp_save).click()
 
-        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_edit)))
-        self.wd.find_element_by_xpath(xp_address).screenshot('address.png')
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_edit)))
+        self.screen_shot(self.wd.find_element_by_xpath(xp_address), 'address')
 
-    def shot_select_coupon_sum_price(self):
+    def shots_qty_item_for_coupon(self):
+        xp_unit_price = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[5]/div/span/span'
+        xp_sum = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[6]/span'
+        coupon_type = 'sum'  # 两种类型，num和sum
+        coupons = [79, 129, 199]
         js = "var q=document.documentElement.scrollTop=100000"
         self.wd.execute_script(js)
 
+        if coupon_type is 'sum':
+            for coupon in coupons:
+                unit_price = float(self.wd.find_element_by_xpath(xp_unit_price).text[1:])
+                sum = float(self.wd.find_element_by_xpath(xp_sum).text[1:])
+                qty_times = math.ceil((coupon - sum) / unit_price)
+                if qty_times <= 0:
+                    qty_times -= 1
+                self.qty_items(qty_times)
+                self.screen_shot(self.wd, 'coupon'+str(coupon))
 
 
 def gen_email_password():
@@ -605,60 +627,59 @@ def gen_email_password():
 
     return (email, password)
 
-
-def test_main(email, password):
-    # try:
-    #     test_main_1(ms=False)
-    # except Exception:
-    #     print('test_main_1 fail')
-    #     traceback.print_exc()
-
-    try:
-        test_main_2(email, password, ms=False)
-    except Exception:
-        print('test_main_2 fail')
-        traceback.print_exc()
-
-
-def test_main_1(ms=False):
-    chicme = Se_chicme(msite=ms)
-    chicme.add_chart()
-    chicme.fill_address()
-    chicme.select_coupon()
-    chicme.pay_paypal()
-    chicme.wd.save_screenshot('test1.1.png')
-
-    # 1.2
-    chicme.enter_index()
-    chicme.add_chart(haveCache=True)
-    # chicme.fill_address()
-    chicme.pay_creditcard('4000020951595032', haveCache=True)
-    chicme.wd.save_screenshot('test1.2.png')
-
-    # 1.3
-    chicme2 = Se_chicme(msite=ms)
-    chicme2.add_chart()
-    chicme2.fill_address()
-    chicme2.pay_creditcard('4002812166761203')
-    chicme2.wd.save_screenshot('test1.3.png')
-
-
-def test_main_2(email, password, ms):
-    chicme = Se_chicme(msite=ms)
-    chicme.enter_login()
-    chicme.regist(email, password, 'a', 'b')
-    # chicme.logout()
-    # chicme.enter_login()
-    # chicme.login(email, password)
-    chicme.add_chart()
-    chicme.fill_address()
-    chicme.pay_paypal()
-    chicme.wd.get(web + '/cart/checkout')
-    chicme.pay_creditcard('4000020951595032')
-    chicme.wd.get(web + '/cart/checkout')
-    chicme.pay_creditcard('4002812166761203', haveCache=True)
-
-
-if __name__ == '__main__':
-    email, password = gen_email_password()
-    test_main(email, password)
+# def test_main(email, password):
+#     # try:
+#     #     test_main_1(ms=False)
+#     # except Exception:
+#     #     print('test_main_1 fail')
+#     #     traceback.print_exc()
+#
+#     try:
+#         test_main_2(email, password, ms=False)
+#     except Exception:
+#         print('test_main_2 fail')
+#         traceback.print_exc()
+#
+#
+# def test_main_1(ms=False):
+#     chicme = Se_chicme(msite=ms)
+#     chicme.add_chart()
+#     chicme.fill_address()
+#     chicme.select_coupon()
+#     chicme.pay_paypal()
+#     chicme.wd.save_screenshot('test1.1.png')
+#
+#     # 1.2
+#     chicme.enter_index()
+#     chicme.add_chart(haveCache=True)
+#     # chicme.fill_address()
+#     chicme.pay_creditcard('4000020951595032', haveCache=True)
+#     chicme.wd.save_screenshot('test1.2.png')
+#
+#     # 1.3
+#     chicme2 = Se_chicme(msite=ms)
+#     chicme2.add_chart()
+#     chicme2.fill_address()
+#     chicme2.pay_creditcard('4002812166761203')
+#     chicme2.wd.save_screenshot('test1.3.png')
+#
+#
+# def test_main_2(email, password, ms):
+#     chicme = Se_chicme(msite=ms)
+#     chicme.enter_login()
+#     chicme.regist(email, password, 'a', 'b')
+#     # chicme.logout()
+#     # chicme.enter_login()
+#     # chicme.login(email, password)
+#     chicme.add_chart()
+#     chicme.fill_address()
+#     chicme.pay_paypal()
+#     chicme.wd.get(web + '/cart/checkout')
+#     chicme.pay_creditcard('4000020951595032')
+#     chicme.wd.get(web + '/cart/checkout')
+#     chicme.pay_creditcard('4002812166761203', haveCache=True)
+#
+#
+# if __name__ == '__main__':
+#     email, password = gen_email_password()
+#     test_main(email, password)

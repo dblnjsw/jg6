@@ -49,7 +49,7 @@ class Execer():
             else:
                 exec(l)
 
-        print('section over:\n'+str(lines))
+        print('section over')
 
         # print(lines)
 
