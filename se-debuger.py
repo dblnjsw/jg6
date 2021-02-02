@@ -10,6 +10,8 @@ from importlib import reload
 import atexit
 import inspect
 import types
+from PIL import Image
+from PIL import ImageTk
 from time import sleep
 
 ch_group = {}
@@ -17,8 +19,14 @@ sections = []
 map_section_name_button = {}
 map_section_name_value = {}
 map_function_name_button = {}
+map_currentChromes_name_rbutton = {}
+win = tk.Tk()
+v_currentChromes = tk.IntVar()
 names = locals()
 csection = None
+image = None
+im = None
+text_locate = tk.StringVar()
 
 
 @atexit.register
@@ -33,7 +41,7 @@ class Execer():
     scope = {}
 
     def ex(self, lines):
-        print('section start:\n'+str(lines))
+        print('section start:\n' + str(lines))
         lines = lines.split('\n')
         global names
         for l in lines:
@@ -41,9 +49,15 @@ class Execer():
             l = l.replace('\n', '')
             l = l.replace('\t', '')
 
-            if 'Se_chicme()' in l:
-                ls = l.split('=')
+            if 'Se_chicme' in l:
+                ls = l.split('=', 1)
+
                 l = 'names["' + ls[0] + '"]=' + ls[1]
+                v = len(map_currentChromes_name_rbutton)
+                map_currentChromes_name_rbutton[ls[0]] = tk.Radiobutton(lf_functions, text=ls[0],
+                                                                        variable=v_currentChromes, value=v)
+                map_currentChromes_name_rbutton[ls[0]].pack()
+                win.update()
                 exec(l)
                 ch_group[ls[0]] = names[ls[0]]
             else:
@@ -62,6 +76,32 @@ def b_run():
     lines = textarea.get('1.0', tk.END)
     t = Thread(target=execer.ex, args=(lines,))
     t.start()
+
+
+def b_locate():
+    global im
+    global image
+    prefix=None
+    i = 0
+    text_locate.set('正在定位。。。')
+    for e in map_currentChromes_name_rbutton:
+        if v_currentChromes.get() == i:
+            prefix = e
+            break
+        i += 1
+    element=ch_group[prefix].find_element_by_xpath(e_locate_xpath.get())
+    if element:
+        text_locate.set('定位成功')
+    else:
+        text_locate.set('定位失败')
+        return
+    image = Image.open("locate.png")
+    im = ImageTk.PhotoImage(image)
+    c_locate.create_image(300, 300,image=im)
+
+    c_locate.pack()
+    win.update()
+    pass
 
 
 def b_new():
@@ -93,7 +133,15 @@ def b_section(name):
 
 def b_function(name):
     textarea.delete('1.0', tk.END)
-    textarea.insert(tk.END, 'chicme.' + name + '()')
+    prefix = 'chicme.'
+    i = 0
+    for e in map_currentChromes_name_rbutton:
+        if v_currentChromes.get() == i:
+            prefix = e + '.'
+            break
+        i += 1
+
+    textarea.insert(tk.END, prefix + name + '()')
 
 
 def b_save():
@@ -111,7 +159,6 @@ def b_reload():
     messagebox.showinfo(message='reload suceess')
 
 
-
 def on_closing():
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
         with open('se-records.txt', 'w', encoding='UTF-8') as f:
@@ -119,12 +166,18 @@ def on_closing():
             f.write(js)
         win.destroy()
 
+
 def key_ctrl_z(event):
     textarea.edit_undo()
+
+
 def callback(event):
     textarea.edit_separator()
+
+
 def key_enter(event):
     b_new()
+
 
 def reload_functions():
     for b in map_function_name_button:
@@ -136,10 +189,10 @@ def reload_functions():
             map_function_name_button[item] = b
     win.update()
 
+
 changeFlag = False
 # c=Se_chicme()
 
-win = tk.Tk()
 win.title('se-debuger v1.0')
 win.geometry('1360x800')
 
@@ -160,9 +213,9 @@ b_out_save.pack()
 b_out_reload.pack()
 b.pack()
 
-textarea = tk.Text(lf_out,undo=True,autoseparators=False)
-textarea.bind('<Control-z>',key_ctrl_z)
-textarea.bind('<Key>',callback)
+textarea = tk.Text(lf_out, undo=True, autoseparators=False)
+textarea.bind('<Control-z>', key_ctrl_z)
+textarea.bind('<Key>', callback)
 vscroll = tk.Scrollbar(lf_out, orient=tk.VERTICAL, command=textarea.yview)
 textarea['yscroll'] = vscroll.set
 vscroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -174,7 +227,7 @@ lf_sections_action = tk.LabelFrame(lf_sections, text='action')
 b_new_section = tk.Button(lf_sections_action, text='new', command=b_new)
 b_delete_section = tk.Button(lf_sections_action, text='delete', command=b_delete)
 b_new_name = tk.Entry(lf_sections)
-b_new_name.bind('<Return>',key_enter)
+b_new_name.bind('<Return>', key_enter)
 
 lf_sections.pack(side=tk.LEFT, fill=tk.Y)
 b_new_name.pack()
@@ -186,6 +239,27 @@ lf_functions.pack(side=tk.LEFT, fill=tk.Y)
 
 b_new_section.pack(side=tk.LEFT)
 b_delete_section.pack(side=tk.RIGHT)
+
+# locate
+lf_locate = tk.LabelFrame(win, text='locate')
+lf_locate.pack(side=tk.LEFT, fill=tk.Y)
+
+e_locate_xpath = tk.Entry(lf_locate)
+b_locate_b = tk.Button(lf_locate, text='locate', command=b_locate)
+l_locate=tk.Label(lf_locate,textvariable=text_locate)
+# text_locate.set('未找到')
+c_locate = tk.Canvas(lf_locate,height=600,width=600)
+
+# image = Image.open("paypal.png")
+# im=ImageTk.PhotoImage(image)
+# c_locate.create_image(500,500,image=im)
+
+
+e_locate_xpath.pack()
+b_locate_b.pack()
+l_locate.pack()
+# c_locate.pack()
+
 
 # init
 if os.path.exists('se-records.txt'):

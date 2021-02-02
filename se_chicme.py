@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.touch_actions import TouchActions
 import random
 import time
 import math
@@ -30,6 +31,7 @@ class Se_chicme():
             self.wd = driver
             self.wait = WebDriverWait(self.wd, 10)
             self.longwait = WebDriverWait(self.wd, 30)
+            self.msite = msite
             return
         option = webdriver.ChromeOptions()
         self.msite = msite
@@ -63,13 +65,17 @@ class Se_chicme():
         self.__pop_up0()
         # se_chicme_static.login(self.wd,self.wait,self.longwait,email,password)
 
-    def regist(self, email, password, firstname, lastname):
+    def regist(self):
         xpath_email = '//form[@id="register-former"]/div/input[@id="email"]'
         xpath_password = '//form[@id="register-former"]/div/input[@id="password"]'
         xpath_firstname = '//input[@id="firstName"]'
         xpath_lastname = '//input[@id="lastName"]'
         xpath_read = '//span[@id="read"]'
         xpath_button = '//button[@id="submit-register"]'
+
+        (email, password) = gen_email_password()
+        firstname = 'a'
+        lastname = 'b'
 
         self.wd.find_element_by_xpath(xpath=xpath_email).send_keys(email)
         self.wd.find_element_by_xpath(xpath=xpath_password).send_keys(password)
@@ -309,7 +315,9 @@ class Se_chicme():
         """
         print("fill_address:填写个人信息")
         (email, password) = gen_email_password()
-        xp_checkout = '//div[text()="Proceed to Checkout"]'
+        # xp_checkout = '//div[text()="Proceed to Checkout"]'
+        xp_checkout = '//div[contains(text(),"Check")]'
+
         xp_email = '//input[@name="email"]'
         xp_name = '//input[@name="name"]'
         xp_streetaddress = '//input[@name="streetAddress1"]'
@@ -406,27 +414,21 @@ class Se_chicme():
             self.wd.find_element_by_xpath(xp_op).click()
             time.sleep(0.5)
 
-    def t(self):
-        # self.wd.get('https://www.baidu.com')
-        # self.wd.get('https://www.google.com')
-
-        # self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="filter-products"]/div[1]/figure/a/div/div[2]')))
-        pass
-
-    def screen_shot(self, element, name):
+    def screen_shot(self, name, element=None):
         # width = self.wd.execute_script("return document.documentElement.scrollWidth")
         # height = self.wd.execute_script("return document.documentElement.scrollHeight")
         # self.wd.maximize_window()
         time.sleep(1)
-        if isinstance(element,webdriver.Chrome):
-            element.save_screenshot(name + '.png')
+        if self.msite:
+            name += '_ms'
+        if not element:
+            self.wd.save_screenshot(name + '.png')
         else:
             element.screenshot(name + '.png')
         print('图片已保存：' + name + '.png')
 
     def enter_login(self):
         print('enter_login:跳转登录界面')
-        self.__pop_up_index()
         cs_login = 'span[class="iconfont"]'
         cs_login_email = 'input#email'
         try:
@@ -480,31 +482,49 @@ class Se_chicme():
         except:
             print('未完成支付')
 
-    def enter_item_detail(self):
+    def enterDetail_swORindex2itemDetail(self):
         xp_trending = '//a[@data-type="Trending Now"]'
         xp_item = '//*[@id="filter-products"]/div[1]/figure/a/div/img'
-        
-        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_trending)))
-        self.wd.find_element_by_xpath(xp_trending).click()
-        
-        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_item)))
-        self.wd.find_element_by_xpath(xp_item).click()
+
+        xp_item_ms = '//div[@class="xi-list-product"]'
+
+        if not self.msite:
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_trending)))
+            self.wd.find_element_by_xpath(xp_trending).click()
+
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_item)))
+            self.wd.find_element_by_xpath(xp_item).click()
+        else:
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_item_ms)))
+            element = self.wd.find_element_by_xpath(xp_item_ms)
+            self.wd.execute_script("arguments[0].scrollIntoView(true);", element)
+            element.click()
 
     def enter_item_pop(self):
         xp_trending = '//a[@data-type="Trending Now"]'
         xp_item = '//*[@id="filter-products"]/div[1]/figure/a/div/img'
         xp_addchart = '//*[@id="filter-products"]/div[1]/figure/a/div/div[2]'
 
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_trending)))
-        self.wd.find_element_by_xpath(xp_trending).click()
+        xp_addcart_ms = '//*[@id="ninimour-black-friday"]/div[3]/div[1]/ul/li[1]/div/a/figure/figcaption/div/div[2]/span'
 
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_item)))
-        self.wd.execute_script("window.scrollTo(0,100)")
-        item = self.wd.find_element_by_xpath(xp_item)
-        ActionChains(self.wd).move_to_element(item).perform()
+        if not self.msite:
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_trending)))
+            self.wd.find_element_by_xpath(xp_trending).click()
 
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_addchart)))
-        self.wd.find_element_by_xpath(xp_addchart).click()
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_item)))
+            self.wd.execute_script("window.scrollTo(0,100)")
+            item = self.wd.find_element_by_xpath(xp_item)
+            ActionChains(self.wd).move_to_element(item).perform()
+
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_addchart)))
+            self.wd.find_element_by_xpath(xp_addchart).click()
+        else:
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_addcart_ms)))
+            element = self.wd.find_element_by_xpath(xp_addcart_ms)
+            # self.wd.execute_script("arguments[0].scrollIntoView(true);", element)
+            self.wd.execute_script("window.scrollTo(0,400)")
+
+            element.click()
 
     def select_item_attr_pop(self):
         cs_colors = 'ul.p-colors li'
@@ -524,7 +544,7 @@ class Se_chicme():
         else:
             sizes[0].click()
 
-        self.screen_shot(self.wd, "item")
+        self.screen_shot("item")
 
         self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_addchart)))
         self.wd.find_element_by_css_selector(cs_addchart).click()
@@ -549,54 +569,104 @@ class Se_chicme():
     def enter_cart(self):
         self.wd.get(web + '/cart')
 
+    def long_screen_shot(self, window, element, name):
+        print(window.size['height'])
+        print(element.size['height'])
+
+        ws = window.size['height']
+        es = element.size['height']
+
+        if es < ws * 2:
+            element.screenshot(name + '0.png')
+            js = "var q=document.documentElement.scrollTop=10000"
+            self.wd.execute_script(js)
+            element.screenshot(name + '1.png')
+
     def shots_select_item_describe(self):
-        cs_describe = 'div.xp-description'
-        xp_model_button = '//*[@id="htabheaders"]/li[1]'
-        xp_model = '//*[@id="hmodel"]/div'
-        xp_shipping_button = '//*[@id="htabheaders"]/li[3]'
-        xp_shipping = '//*[@id="hshipping"]/div'
-        xp_policy_button = '//*[@id="htabheaders"]/li[4]'
-        xp_policy = '//*[@id="hreturnpolicy"]/div'
+        # cs_describe = 'div.xp-description'
+        # xp_model_button = '//*[@id="htabheaders"]/li[@href="#hmodel"]'
+        # xp_model = '//*[@id="hmodel"]/div'
+        # xp_shipping_button = '//*[@id="htabheaders"]/li[@href="#hshipping"]'
+        # xp_shipping = '//*[@id="hshipping"]/div'
+        # xp_policy_button = '//*[@id="htabheaders"]/li[@href=""#hreturnpolicy]'
+        # xp_policy = '//*[@id="hreturnpolicy"]/div'
+        xp_tabheads = '//*[@id="htabheaders"]/li'
+        xp_sizeguide = '//ul[@id="sizes"]/li'
+        xp_size_main = '//div[@class="i-size-guid"]/div/div[@class="mainArea"]'
 
-        self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_describe)))
-        d = self.wd.find_element_by_css_selector(cs_describe)
-        d.screenshot('item_describe.png')
-
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_model_button)))
-        self.wd.find_element_by_xpath(xp_model_button).click()
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_model)))
-        d = self.wd.find_element_by_xpath(xp_model)
-        d.screenshot('item_model.png')
-
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_shipping_button)))
-        self.wd.find_element_by_xpath(xp_shipping_button).click()
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_shipping)))
-        d = self.wd.find_element_by_xpath(xp_shipping)
-        d.screenshot('item_shipping.png')
-
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_policy_button)))
-        self.wd.find_element_by_xpath(xp_policy_button).click()
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_policy)))
-        d = self.wd.find_element_by_xpath(xp_policy)
-        d.screenshot('item_policy.png')
+        self.wd.find_elements_by_xpath(xp_sizeguide)[-1].click()
+        frame = self.wd.find_element_by_xpath('//iframe[@id="sizechartframe"]')
+        self.wd.switch_to.frame(frame)
+        self.wd.find_element_by_xpath(xp_size_main).screenshot('sizeguide_item.png')
+        self.wd.find_element_by_xpath('/html/body/div/div/div/div[1]/i').click()
+        self.wd.switch_to.default_content()
+        heads = self.wd.find_elements_by_xpath(xp_tabheads)
+        for head in heads:
+            try:
+                head.click()
+            except:
+                continue
+            href = head.get_attribute('href')
+            xp = '//li[@id="' + href[1:] + '"]'
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp)))
+            self.wd.find_element_by_xpath(xp).screenshot(href[2:] + "_item.png")
+        # self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_describe)))
+        # d = self.wd.find_element_by_css_selector(cs_describe)
+        # d.screenshot('item_describe.png')
+        #
+        # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_model_button)))
+        # self.wd.find_element_by_xpath(xp_model_button).click()
+        # try:
+        #     self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_model)))
+        #     d = self.wd.find_element_by_xpath(xp_model)
+        #     d.screenshot('item_model.png')
+        # except:
+        #     print('未找到model')
+        #
+        # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_shipping_button)))
+        # self.wd.find_element_by_xpath(xp_shipping_button).click()
+        # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_shipping)))
+        # d = self.wd.find_element_by_xpath(xp_shipping)
+        # d.screenshot('item_shipping.png')
+        #
+        # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_policy_button)))
+        # self.wd.find_element_by_xpath(xp_policy_button).click()
+        # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_policy)))
+        # d = self.wd.find_element_by_xpath(xp_policy)
+        # d.screenshot('item_policy.png')
 
     def shot_edit_address(self):
         xp_edit = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div/address/div[2]/span[2]/span[2]/span'
+        xp_edit_ms = '//a[@href="/cart/address"]/span'
         xp_input = '//input[@name="unit"]'
         xp_save = '//button[text()="Save"]'
+        xp_submit_ms = '//Button[text()="Submit"]'
+
         xp_address = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div'
 
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_edit)))
-        self.wd.find_element_by_xpath(xp_edit).click()
+        if not self.msite:
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_edit)))
+            self.wd.find_element_by_xpath(xp_edit).click()
 
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_input)))
-        self.wd.find_element_by_xpath(xp_input).send_keys('EEEEEEEEEE')
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_input)))
+            self.wd.find_element_by_xpath(xp_input).send_keys('EEEEEEEEEE')
 
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_save)))
-        self.wd.find_element_by_xpath(xp_save).click()
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_save)))
+            self.wd.find_element_by_xpath(xp_save).click()
 
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_edit)))
-        self.screen_shot(self.wd.find_element_by_xpath(xp_address), 'address')
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_edit)))
+            self.screen_shot(self.wd.find_element_by_xpath(xp_address), 'address')
+        else:
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_edit_ms)))
+            self.wd.find_element_by_xpath(xp_edit_ms).click()
+
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_input)))
+            self.wd.find_element_by_xpath(xp_input).send_keys('EEEEEEEEEE')
+
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_submit_ms)))
+            self.wd.find_element_by_xpath(xp_submit_ms).click()
+
+            self.screen_shot('address')
 
     def shots_qty_item_for_coupon(self):
         xp_unit_price = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[5]/div/span/span'
@@ -614,7 +684,22 @@ class Se_chicme():
                 if qty_times <= 0:
                     qty_times -= 1
                 self.qty_items(qty_times)
-                self.screen_shot(self.wd, 'coupon'+str(coupon))
+                self.screen_shot('coupon' + str(coupon))
+
+    def find_element_by_xpath(self,xpath):
+        try:
+            element=self.wd.find_element_by_xpath(xpath)
+
+            element.screenshot('locate.png')
+            return element
+        except:
+            return None
+
+
+    def t(self):
+        self.wd.execute_script("window.scrollTo(0,50)")
+
+        pass
 
 
 def gen_email_password():
