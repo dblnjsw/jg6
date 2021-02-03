@@ -32,9 +32,10 @@ text_locate = tk.StringVar()
 @atexit.register
 def exit():
     print('exit')
-    with open('se-records.txt', 'w', encoding='UTF-8') as f:
-        js = json.dumps(map_section_name_value)
-        f.write(js)
+    if len(map_section_name_value) != 0:
+        with open('se-records.txt', 'w', encoding='UTF-8') as f:
+            js = json.dumps(map_section_name_value)
+            f.write(js)
 
 
 class Execer():

@@ -39,7 +39,11 @@ class Se_chicme():
         if self.headless:
             option.add_argument('--headless')
         if self.msite:
-            mobileEmulation = {'deviceName': 'iPhone X'}
+            # mobileEmulation = {'deviceName': 'iPhone X'}
+            mobileEmulation = {
+            "deviceMetrics": {"width": 360, "height": 640, "pixelRatio": 3.0},  # 定义设备高宽，像素比
+            "userAgent": "Mozilla/5.0 (Linux; Android 4.2.1; en-us; Nexus 5 Build/JOP40D) "  # 通过UA来模拟
+            "AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"}
             option.add_experimental_option('mobileEmulation', mobileEmulation)
 
         option.add_argument('--ignore-ssl-errors=yes')
@@ -52,7 +56,7 @@ class Se_chicme():
 
         # self.wd.get('https://www.chicme.xyz')
         self.wd.maximize_window()
-        self.enter_index()
+        self.enterIndex()
 
     def login(self, email, password):
         locator = (By.XPATH, '//input[@id="email"]')
@@ -95,7 +99,7 @@ class Se_chicme():
         self.wd.find_element_by_css_selector(cs_logout).click()
 
     # @staticmethod
-    def add_chart(self, haveCache=False):
+    def __add_chart(self, haveCache=False):
         print("add_chart:商品加入购物车")
 
         # cs_items = 'span[class="__btn addtocart"]'
@@ -173,7 +177,7 @@ class Se_chicme():
             #     self.longwait.until(EC.element_to_be_clickable((By.XPATH, xp_checkout_ms)))
             #     self.wd.find_element_by_xpath(xp_checkout_ms).click()
 
-    def pay_paypal(self, wd=wd, wait=wait, longwait=longwait):
+    def __pay_paypal(self, wd=wd, wait=wait, longwait=longwait):
         print("pay_paypal:paypal支付")
         xp_confirm = '//button[text()="Confirm"]'
         xp_paywith = '//div[@aria-label="Pay with PayPal"]'
@@ -250,7 +254,7 @@ class Se_chicme():
             self.afterpay()
             self.screen_shot('paypal_msite')
 
-    def pay_creditcard(self, cardname, haveCache=False):
+    def __pay_creditcard(self, cardname, haveCache=False):
         """
 
         :param cardname:
@@ -349,7 +353,7 @@ class Se_chicme():
             self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_confirm)))
             self.wd.find_element_by_xpath(xp_confirm).click()
 
-    def select_coupon(self, coupon_index=0):
+    def __select_coupon(self, coupon_index=0):
         coupons_num = [3, 5]
         xp_select = '//div[@class="__select"]'
         xp_use = '//div[@class="__use"]'
@@ -427,7 +431,7 @@ class Se_chicme():
             element.screenshot(name + '.png')
         print('图片已保存：' + name + '.png')
 
-    def enter_login(self):
+    def enterLogin(self):
         print('enter_login:跳转登录界面')
         cs_login = 'span[class="iconfont"]'
         cs_login_email = 'input#email'
@@ -440,7 +444,7 @@ class Se_chicme():
             self.wd.get(self.web + '/i/login')
             print('跳转成功')
 
-    def enter_index(self):
+    def enterIndex(self):
         xp_banner = '//*[@id="i-collection-events"]/li[2]/a/img'
         self.wd.get(self.web)
         self.__pop_up_index()
@@ -474,7 +478,7 @@ class Se_chicme():
             except:
                 print('未找到首页弹窗')
 
-    def afterpay(self):
+    def __afterpay(self):
         cs_cls = 'a.stjr-review-checkout-widget-body__close'
         try:
             self.longwait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_cls)))
@@ -482,7 +486,7 @@ class Se_chicme():
         except:
             print('未完成支付')
 
-    def enterDetail_swORindex2itemDetail(self):
+    def enterDetail_swORindex2itemDetail_pcms(self):
         xp_trending = '//a[@data-type="Trending Now"]'
         xp_item = '//*[@id="filter-products"]/div[1]/figure/a/div/img'
 
@@ -500,7 +504,7 @@ class Se_chicme():
             self.wd.execute_script("arguments[0].scrollIntoView(true);", element)
             element.click()
 
-    def enter_item_pop(self):
+    def enterItemPop_trendingORindex2itemPop_pcms(self):
         xp_trending = '//a[@data-type="Trending Now"]'
         xp_item = '//*[@id="filter-products"]/div[1]/figure/a/div/img'
         xp_addchart = '//*[@id="filter-products"]/div[1]/figure/a/div/div[2]'
@@ -526,7 +530,7 @@ class Se_chicme():
 
             element.click()
 
-    def select_item_attr_pop(self):
+    def selectItemAttrPop(self):
         cs_colors = 'ul.p-colors li'
         cs_sizes = 'ul.p-sizes > li'
         cs_addchart = 'span.x-product-buy'
@@ -549,7 +553,7 @@ class Se_chicme():
         self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_addchart)))
         self.wd.find_element_by_css_selector(cs_addchart).click()
 
-    def select_item_attr_detail(self):
+    def selectAttrDetail(self):
         cs_colors = 'ul.xp-colors li'
         cs_sizes = 'ul#sizes > li'
 
@@ -566,7 +570,7 @@ class Se_chicme():
         else:
             sizes[0].click()
 
-    def enter_cart(self):
+    def enterCart(self):
         self.wd.get(web + '/cart')
 
     def long_screen_shot(self, window, element, name):
@@ -582,60 +586,35 @@ class Se_chicme():
             self.wd.execute_script(js)
             element.screenshot(name + '1.png')
 
-    def shots_select_item_describe(self):
-        # cs_describe = 'div.xp-description'
-        # xp_model_button = '//*[@id="htabheaders"]/li[@href="#hmodel"]'
-        # xp_model = '//*[@id="hmodel"]/div'
-        # xp_shipping_button = '//*[@id="htabheaders"]/li[@href="#hshipping"]'
-        # xp_shipping = '//*[@id="hshipping"]/div'
-        # xp_policy_button = '//*[@id="htabheaders"]/li[@href=""#hreturnpolicy]'
-        # xp_policy = '//*[@id="hreturnpolicy"]/div'
+    def shotsSelectDescribe(self):
         xp_tabheads = '//*[@id="htabheaders"]/li'
         xp_sizeguide = '//ul[@id="sizes"]/li'
         xp_size_main = '//div[@class="i-size-guid"]/div/div[@class="mainArea"]'
 
-        self.wd.find_elements_by_xpath(xp_sizeguide)[-1].click()
-        frame = self.wd.find_element_by_xpath('//iframe[@id="sizechartframe"]')
-        self.wd.switch_to.frame(frame)
-        self.wd.find_element_by_xpath(xp_size_main).screenshot('sizeguide_item.png')
-        self.wd.find_element_by_xpath('/html/body/div/div/div/div[1]/i').click()
-        self.wd.switch_to.default_content()
-        heads = self.wd.find_elements_by_xpath(xp_tabheads)
-        for head in heads:
-            try:
-                head.click()
-            except:
-                continue
-            href = head.get_attribute('href')
-            xp = '//li[@id="' + href[1:] + '"]'
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp)))
-            self.wd.find_element_by_xpath(xp).screenshot(href[2:] + "_item.png")
-        # self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_describe)))
-        # d = self.wd.find_element_by_css_selector(cs_describe)
-        # d.screenshot('item_describe.png')
-        #
-        # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_model_button)))
-        # self.wd.find_element_by_xpath(xp_model_button).click()
-        # try:
-        #     self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_model)))
-        #     d = self.wd.find_element_by_xpath(xp_model)
-        #     d.screenshot('item_model.png')
-        # except:
-        #     print('未找到model')
-        #
-        # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_shipping_button)))
-        # self.wd.find_element_by_xpath(xp_shipping_button).click()
-        # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_shipping)))
-        # d = self.wd.find_element_by_xpath(xp_shipping)
-        # d.screenshot('item_shipping.png')
-        #
-        # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_policy_button)))
-        # self.wd.find_element_by_xpath(xp_policy_button).click()
-        # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_policy)))
-        # d = self.wd.find_element_by_xpath(xp_policy)
-        # d.screenshot('item_policy.png')
 
-    def shot_edit_address(self):
+
+        if not self.msite:
+            self.wd.find_elements_by_xpath(xp_sizeguide)[-1].click()
+            frame = self.wd.find_element_by_xpath('//iframe[@id="sizechartframe"]')
+            self.wd.switch_to.frame(frame)
+            self.wd.find_element_by_xpath(xp_size_main).screenshot('sizeguide_item.png')
+            self.wd.find_element_by_xpath('/html/body/div/div/div/div[1]/i').click()
+            self.wd.switch_to.default_content()
+            heads = self.wd.find_elements_by_xpath(xp_tabheads)
+            for head in heads:
+                try:
+                    head.click()
+                except:
+                    continue
+                href = head.get_attribute('href')
+                xp = '//li[@id="' + href[1:] + '"]'
+                self.wait.until(EC.element_to_be_clickable((By.XPATH, xp)))
+                self.wd.find_element_by_xpath(xp).screenshot(href[2:] + "_item.png")
+        else:
+            pass
+
+
+    def shotEditAddress(self):
         xp_edit = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div/address/div[2]/span[2]/span[2]/span'
         xp_edit_ms = '//a[@href="/cart/address"]/span'
         xp_input = '//input[@name="unit"]'
@@ -668,7 +647,7 @@ class Se_chicme():
 
             self.screen_shot('address')
 
-    def shots_qty_item_for_coupon(self):
+    def shotsQtyForCoupon(self):
         xp_unit_price = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[5]/div/span/span'
         xp_sum = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[6]/span'
         coupon_type = 'sum'  # 两种类型，num和sum
