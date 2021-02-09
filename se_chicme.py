@@ -587,7 +587,12 @@ class Se_chicme():
             element.screenshot(name + '1.png')
 
     def shotsSelectDescribe(self):
-        '''详情页信息截图'''
+
+        ''''''
+        xp_tabheads = '//*[@id="htabheaders"]/li'
+        xp_sizeguide = '//ul[@id="sizes"]/li'
+        xp_size_main = '//div[@class="i-size-guid"]/div/div[@class="mainArea"]'
+
 
         if not self.msite:
             xp_ship_button = '//*[@id="view-more-shipping"]/div/div[2]'
