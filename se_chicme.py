@@ -587,29 +587,24 @@ class Se_chicme():
             element.screenshot(name + '1.png')
 
     def shotsSelectDescribe(self):
-        xp_tabheads = '//*[@id="htabheaders"]/li'
-        xp_sizeguide = '//ul[@id="sizes"]/li'
-        xp_size_main = '//div[@class="i-size-guid"]/div/div[@class="mainArea"]'
 
 
 
         if not self.msite:
-            self.wd.find_elements_by_xpath(xp_sizeguide)[-1].click()
-            frame = self.wd.find_element_by_xpath('//iframe[@id="sizechartframe"]')
-            self.wd.switch_to.frame(frame)
-            self.wd.find_element_by_xpath(xp_size_main).screenshot('sizeguide_item.png')
-            self.wd.find_element_by_xpath('/html/body/div/div/div/div[1]/i').click()
-            self.wd.switch_to.default_content()
-            heads = self.wd.find_elements_by_xpath(xp_tabheads)
-            for head in heads:
-                try:
-                    head.click()
-                except:
-                    continue
-                href = head.get_attribute('href')
-                xp = '//li[@id="' + href[1:] + '"]'
-                self.wait.until(EC.element_to_be_clickable((By.XPATH, xp)))
-                self.wd.find_element_by_xpath(xp).screenshot(href[2:] + "_item.png")
+            xp_ex = '//*[@id="i-navigation"]/ul/li[2]/a'
+            xp_item = '//*[@id="filter-products"]/div[1]/figure/a/div/img'
+            xp_cart = '//*[@id="addtocart"]'
+            xp_ship_i = '//*[@id="openshipping"]'
+            xp_sp_st = '/html/body/div[6]'
+            # self.wd.find_element_by_xpath(xp_tc).click()
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_ex)))
+            self.wd.find_element_by_xpath(xp_ex).click()
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_item)))
+            self.wd.find_element_by_xpath(xp_item).click()
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_cart)))
+            self.wd.find_element_by_xpath(xp_cart).click()
+            self.wd.find_element_by_xpath(xp_ship_i).click()
+            self.screen_shot('shipping')
         else:
             pass
 
@@ -676,8 +671,20 @@ class Se_chicme():
 
 
     def t(self):
-        self.wd.execute_script("window.scrollTo(0,50)")
-
+        xp_ex='//*[@id="i-navigation"]/ul/li[2]/a'
+        xp_item='//*[@id="filter-products"]/div[1]/figure/a/div/img'
+        xp_cart='//*[@id="addtocart"]'
+        xp_ship_i='//*[@id="openshipping"]'
+        xp_sp_st='/html/body/div[6]'
+        # self.wd.find_element_by_xpath(xp_tc).click()
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_ex)))
+        self.wd.find_element_by_xpath(xp_ex).click()
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_item)))
+        self.wd.find_element_by_xpath(xp_item).click()
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_cart)))
+        self.wd.find_element_by_xpath(xp_cart).click()
+        self.wd.find_element_by_xpath(xp_ship_i).click()
+        self.screen_shot('shipping')
         pass
 
 
