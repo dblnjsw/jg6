@@ -587,6 +587,7 @@ class Se_chicme():
             element.screenshot(name + '1.png')
 
     def shotsSelectDescribe(self):
+        ''''''
         xp_tabheads = '//*[@id="htabheaders"]/li'
         xp_sizeguide = '//ul[@id="sizes"]/li'
         xp_size_main = '//div[@class="i-size-guid"]/div/div[@class="mainArea"]'
