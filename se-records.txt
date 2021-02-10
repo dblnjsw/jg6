@@ -1,1 +1,1 @@
-{"n": "chicme=Se_chicme()\n", "nms": "chicme=Se_chicme(msite=True)\n"}
+{"n": "chicme=Se_chicme()\n", "nms": "chicme=Se_chicme(msite=True)\n", "main": "chicme.enterDetail_swORindex2itemDetail_pcms()\nchicme.shotsSelectDescribe()\nchicme.enterItemPop_trendingORindex2itemPop_pcms()\nchicme.selectItemAttrPopAndAddCart()\nchicme.enterCart()\nchicme.fill_address()\nchicme.shotsQtyForCoupon()\nchicme.shotEditAddress()\n\n\n"}
