@@ -587,15 +587,52 @@ class Se_chicme():
             element.screenshot(name + '1.png')
 
     def shotsSelectDescribe(self):
-        '''详情页信息截图'''
 
-        if not self.msite:
-            xp_ship_button = '//*[@id="view-more-shipping"]/div/div[2]'
-            iframe_ship = '//iframe[@src="/fs/return-policy"]'
-            xp_return_button = '//*[@id="view-more-return"]/div/div[2]'
 
             xp_size_button = '//*[@id="view-more-size"]/div/div[2]'
             xp_detail_button = '//*[@id="description-open"]/div[2]'
+
+
+        if not self.msite:
+            xp_sp_button = '//*[@id="openshipping"]'
+            xp_sp = '/html/body/div[7]'
+            xp_sp_cls='/html/body/div[7]/span'
+            xp_rp_button = '//*[@id="openreturn"]'
+            xp_rp = '/html/body/div[9]'
+            xp_rp_cls = '/html/body/div[9]/span'
+            xp_dp_button = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[2]/div[1]/span[2]'
+            xp_dp = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[2]/div[2]/div'
+            xp_dp_clo = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[2]/div[1]/span[2]'
+            xp_mp_button ='/html/body/div[3]/div[2]/div[2]/div/div[8]/div[1]/div[1]/span[2]'
+            xp_mp = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[1]/div[2]'
+            xp_mp_col = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[1]/div[1]/span[2]'
+
+            try:
+                self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_sp_button)))
+                self.wd.find_element_by_xpath(xp_sp_button).click()
+                self.screen_shot('shipping', self.wd.find_element_by_xpath(xp_sp))
+                self.wd.find_element_by_xpath(xp_sp_cls).click()
+            except:
+                print('')
+
+            try:
+                self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_rp_button)))
+                self.wd.find_element_by_xpath(xp_rp_button).click()
+                self.screen_shot('return', self.wd.find_element_by_xpath(xp_rp))
+                self.wd.find_element_by_xpath(xp_rp_cls).click()
+            except:
+                print('')
+
+            if xp_mp_button:
+                self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_mp_button)))
+                self.wd.find_element_by_xpath(xp_mp_button).click()
+                self.screen_shot('Model',self.wd.find_element_by_xpath(xp_mp))
+                self.wd.find_element_by_xpath(xp_mp_col).click()
+            if xp_dp_button:
+                self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_dp_button)))
+                self.wd.find_element_by_xpath(xp_dp_button).click()
+                self.screen_shot('details',self.wd.find_element_by_xpath(xp_dp))
+                self.wd.find_element_by_xpath(xp_dp_clo).click()
 
 
         else:
@@ -624,6 +661,7 @@ class Se_chicme():
 
             self.wd.find_element_by_xpath(xp_detail_button).click()
             self.screen_shot(self.wd.find_element_by_xpath(xp_detail), 'detail')
+
 
 
     def shotEditAddress(self):
@@ -689,8 +727,20 @@ class Se_chicme():
 
 
     def t(self):
-        self.wd.execute_script("window.scrollTo(0,50)")
-
+        xp_ex='//*[@id="i-navigation"]/ul/li[2]/a'
+        xp_item='//*[@id="filter-products"]/div[1]/figure/a/div/img'
+        xp_cart='//*[@id="addtocart"]'
+        xp_ship_i='//*[@id="openshipping"]'
+        xp_sp_st='/html/body/div[6]'
+        # self.wd.find_element_by_xpath(xp_tc).click()
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_ex)))
+        self.wd.find_element_by_xpath(xp_ex).click()
+        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_item)))
+        self.wd.find_element_by_xpath(xp_item).click()
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_cart)))
+        self.wd.find_element_by_xpath(xp_cart).click()
+        self.wd.find_element_by_xpath(xp_ship_i).click()
+        self.screen_shot('shipping')
         pass
 
 
