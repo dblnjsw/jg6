@@ -589,24 +589,46 @@ class Se_chicme():
     def shotsSelectDescribe(self):
 
 
-
         if not self.msite:
-            xp_ex = '//*[@id="i-navigation"]/ul/li[2]/a'
-            xp_item = '//*[@id="filter-products"]/div[1]/figure/a/div/img'
-            xp_cart = '//*[@id="addtocart"]'
-            xp_ship_i = '//*[@id="openshipping"]'
-            xp_sp_st = '/html/body/div[6]'
-            # self.wd.find_element_by_xpath(xp_tc).click()
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_ex)))
-            self.wd.find_element_by_xpath(xp_ex).click()
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_item)))
-            self.wd.find_element_by_xpath(xp_item).click()
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_cart)))
-            self.wd.find_element_by_xpath(xp_cart).click()
-            self.wd.find_element_by_xpath(xp_ship_i).click()
-            self.screen_shot('shipping')
-        else:
-            pass
+            xp_sp_button = '//*[@id="openshipping"]'
+            xp_sp = '/html/body/div[7]'
+            xp_sp_cls='/html/body/div[7]/span'
+            xp_rp_button = '//*[@id="openreturn"]'
+            xp_rp = '/html/body/div[9]'
+            xp_rp_cls = '/html/body/div[9]/span'
+            xp_dp_button = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[2]/div[1]/span[2]'
+            xp_dp = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[2]/div[2]/div'
+            xp_dp_clo = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[2]/div[1]/span[2]'
+            xp_mp_button ='/html/body/div[3]/div[2]/div[2]/div/div[8]/div[1]/div[1]/span[2]'
+            xp_mp = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[1]/div[2]'
+            xp_mp_col = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[1]/div[1]/span[2]'
+
+            try:
+                self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_sp_button)))
+                self.wd.find_element_by_xpath(xp_sp_button).click()
+                self.screen_shot('shipping', self.wd.find_element_by_xpath(xp_sp))
+                self.wd.find_element_by_xpath(xp_sp_cls).click()
+            except:
+                print('')
+
+            try:
+                self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_rp_button)))
+                self.wd.find_element_by_xpath(xp_rp_button).click()
+                self.screen_shot('return', self.wd.find_element_by_xpath(xp_rp))
+                self.wd.find_element_by_xpath(xp_rp_cls).click()
+            except:
+                print('')
+
+            if xp_mp_button:
+                self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_mp_button)))
+                self.wd.find_element_by_xpath(xp_mp_button).click()
+                self.screen_shot('Model',self.wd.find_element_by_xpath(xp_mp))
+                self.wd.find_element_by_xpath(xp_mp_col).click()
+            if xp_dp_button:
+                self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_dp_button)))
+                self.wd.find_element_by_xpath(xp_dp_button).click()
+                self.screen_shot('details',self.wd.find_element_by_xpath(xp_dp))
+                self.wd.find_element_by_xpath(xp_dp_clo).click()
 
 
     def shotEditAddress(self):
