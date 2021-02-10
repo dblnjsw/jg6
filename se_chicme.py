@@ -312,7 +312,7 @@ class Se_chicme():
 
             self.screen_shot('creditcard_msite')
 
-    def fill_address(self):
+    def fillAddress(self):
         """
         填写购物车页下的地址具体信息
         无跳转
@@ -425,7 +425,7 @@ class Se_chicme():
         time.sleep(1)
         if self.msite:
             name += '_ms'
-        if not element:
+        if element is None:
             self.wd.save_screenshot(name + '.png')
         else:
             element.screenshot(name + '.png')
@@ -530,7 +530,7 @@ class Se_chicme():
 
             element.click()
 
-    def selectItemAttrPop(self):
+    def selectItemAttrPopAndAddCart(self):
         cs_colors = 'ul.p-colors li'
         cs_sizes = 'ul.p-sizes > li'
         cs_addchart = 'span.x-product-buy'
@@ -589,6 +589,10 @@ class Se_chicme():
     def shotsSelectDescribe(self):
 
 
+            xp_size_button = '//*[@id="view-more-size"]/div/div[2]'
+            xp_detail_button = '//*[@id="description-open"]/div[2]'
+
+
         if not self.msite:
             xp_sp_button = '//*[@id="openshipping"]'
             xp_sp = '/html/body/div[7]'
@@ -631,6 +635,35 @@ class Se_chicme():
                 self.wd.find_element_by_xpath(xp_dp_clo).click()
 
 
+        else:
+            xp_ship_iframe = '//iframe[@src="/fs/shipping-policy"]'
+            xp_ship_button='//*[@id="view-more-shipping"]/div/div[2]'
+            xp_ship='/html/body'
+            xp_return_iframe='//iframe[@src="/fs/return-policy"]'
+            xp_return_button='//*[@id="view-more-return"]/div/div[2]'
+            xp_return='/html/body'
+            # xp_iframe_size = '//iframe[@src="/f/mobile/size?productId=7ecc313b-0d9f-456e-ab21-000a12c73ffb"]'
+            # xp_size_button='//*[@id="view-more-size"]/div/div[2]'
+            xp_detail_button='//*[@id="description-open"]/div[2]'
+            xp_detail='//*[@id="description-fixed"]'
+
+            self.wd.find_element_by_xpath(xp_ship_button).click()
+            frame = self.wd.find_element_by_xpath(xp_ship_iframe)
+            self.wd.switch_to.frame(frame)
+            self.screen_shot(self.wd.find_element_by_xpath(xp_ship),'ship')
+            self.wd.switch_to.default_content()
+
+            self.wd.find_element_by_xpath(xp_return_button).click()
+            frame = self.wd.find_element_by_xpath(xp_return_iframe)
+            self.wd.switch_to.frame(frame)
+            self.screen_shot(self.wd.find_element_by_xpath(xp_return), 'return')
+            self.wd.switch_to.default_content()
+
+            self.wd.find_element_by_xpath(xp_detail_button).click()
+            self.screen_shot(self.wd.find_element_by_xpath(xp_detail), 'detail')
+
+
+
     def shotEditAddress(self):
         xp_edit = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div/address/div[2]/span[2]/span[2]/span'
         xp_edit_ms = '//a[@href="/cart/address"]/span'
@@ -651,7 +684,7 @@ class Se_chicme():
             self.wd.find_element_by_xpath(xp_save).click()
 
             self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_edit)))
-            self.screen_shot(self.wd.find_element_by_xpath(xp_address), 'address')
+            self.screen_shot('address',self.wd.find_element_by_xpath(xp_address))
         else:
             self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_edit_ms)))
             self.wd.find_element_by_xpath(xp_edit_ms).click()
@@ -665,6 +698,7 @@ class Se_chicme():
             self.screen_shot('address')
 
     def shotsQtyForCoupon(self):
+        '''所有coupon优惠组合截图'''
         xp_unit_price = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[5]/div/span/span'
         xp_sum = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[6]/span'
         coupon_type = 'sum'  # 两种类型，num和sum
