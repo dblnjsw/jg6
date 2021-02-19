@@ -41,9 +41,9 @@ class Se_chicme():
         if self.msite:
             # mobileEmulation = {'deviceName': 'iPhone X'}
             mobileEmulation = {
-            "deviceMetrics": {"width": 360, "height": 640, "pixelRatio": 3.0},  # 定义设备高宽，像素比
-            "userAgent": "Mozilla/5.0 (Linux; Android 4.2.1; en-us; Nexus 5 Build/JOP40D) "  # 通过UA来模拟
-            "AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"}
+                "deviceMetrics": {"width": 360, "height": 640, "pixelRatio": 3.0},  # 定义设备高宽，像素比
+                "userAgent": "Mozilla/5.0 (Linux; Android 4.2.1; en-us; Nexus 5 Build/JOP40D) "  # 通过UA来模拟
+                             "AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"}
             option.add_experimental_option('mobileEmulation', mobileEmulation)
 
         option.add_argument('--ignore-ssl-errors=yes')
@@ -228,7 +228,7 @@ class Se_chicme():
 
             self.wd.switch_to.window(handles[0])
             self.afterpay()
-            self.screen_shot('paypal')
+            self.__screen_shot('paypal')
             # self.wd.save_screenshot('a1.jpg')
         else:
             self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_select_paypal_ms)))
@@ -252,7 +252,7 @@ class Se_chicme():
             self.wd.execute_script("arguments[0].click();", self.wd.find_element_by_css_selector(cs_pay_b))
 
             self.afterpay()
-            self.screen_shot('paypal_msite')
+            self.__screen_shot('paypal_msite')
 
     def __pay_creditcard(self, cardname, haveCache=False):
         """
@@ -294,7 +294,7 @@ class Se_chicme():
             self.wd.find_element_by_css_selector(cs_continue).click()
             self.afterpay()
 
-            self.screen_shot('creditcard')
+            self.__screen_shot('creditcard')
         else:
             self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_select_cc_ms)))
             self.wd.execute_script("arguments[0].click();", self.wd.find_element_by_xpath(xp_select_cc_ms))
@@ -310,9 +310,9 @@ class Se_chicme():
             self.wd.find_element_by_css_selector(cs_continue).click()
             self.afterpay()
 
-            self.screen_shot('creditcard_msite')
+            self.__screen_shot('creditcard_msite')
 
-    def fillAddress(self):
+    def fillAddress_pcms(self):
         """
         填写购物车页下的地址具体信息
         无跳转
@@ -370,31 +370,31 @@ class Se_chicme():
         if not self.msite:
             self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_select)))
             item_nums = self.wd.find_element_by_xpath(xp_input).get_attribute('value')
-            self.qty_items(coupons_num[coupon_index] - int(item_nums))
+            self.__qty_items(coupons_num[coupon_index] - int(item_nums))
 
             # self.wd.find_element_by_xpath(xp_select).click()
             # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_use)))
 
             # coupons = self.wd.find_elements_by_xpath(xp_coupons)
             # coupons[coupon_index].find_element_by_xpath(xp_usenow).click()
-            self.screen_shot('coupon' + str(coupon_index))
+            self.__screen_shot('coupon' + str(coupon_index))
 
         else:
             self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_select_ms)))
             item_nums = self.wd.find_element_by_xpath(xp_input_ms).get_attribute('value')
-            self.qty_items(coupons_num[coupon_index] - int(item_nums))
+            self.__qty_items(coupons_num[coupon_index] - int(item_nums))
 
             # self.wd.execute_script("arguments[0].click();", self.wd.find_element_by_xpath(xp_select_ms))
             # self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_use)))
 
             # coupons = self.wd.find_elements_by_xpath(xp_coupons_ms)
             # self.wd.execute_script("arguments[0].click();", coupons[coupon_index].find_element_by_xpath(xp_usenow))
-            self.screen_shot('coupon' + str(coupon_index) + '_ms')
+            self.__screen_shot('coupon' + str(coupon_index) + '_ms')
 
         if coupon_index < len(coupons_num) - 1:
             self.select_coupon(coupon_index + 1)
 
-    def qty_items(self, times):
+    def __qty_items(self, times):
         xp_add = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[4]/div/span[2]'
         xp_minus = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[4]/div/span[1]'
         xp_add_ms = '//*[@id="root"]/div/div[1]/div[2]/div[2]/div/div[3]/div/div/li/div/div[3]/div/div[3]/div[1]/span[2]'
@@ -418,7 +418,7 @@ class Se_chicme():
             self.wd.find_element_by_xpath(xp_op).click()
             time.sleep(0.5)
 
-    def screen_shot(self, name, element=None):
+    def __screen_shot(self, name, element=None):
         # width = self.wd.execute_script("return document.documentElement.scrollWidth")
         # height = self.wd.execute_script("return document.documentElement.scrollHeight")
         # self.wd.maximize_window()
@@ -530,7 +530,7 @@ class Se_chicme():
 
             element.click()
 
-    def selectItemAttrPopAndAddCart(self):
+    def selectItemAttrPopAndAddCart_pc(self):
         cs_colors = 'ul.p-colors li'
         cs_sizes = 'ul.p-sizes > li'
         cs_addchart = 'span.x-product-buy'
@@ -548,12 +548,12 @@ class Se_chicme():
         else:
             sizes[0].click()
 
-        self.screen_shot("item")
+        self.__screen_shot("item")
 
         self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, cs_addchart)))
         self.wd.find_element_by_css_selector(cs_addchart).click()
 
-    def selectAttrDetail(self):
+    def selectAttrDetail_pc(self):
         cs_colors = 'ul.xp-colors li'
         cs_sizes = 'ul#sizes > li'
 
@@ -573,7 +573,7 @@ class Se_chicme():
     def enterCart(self):
         self.wd.get(web + '/cart')
 
-    def long_screen_shot(self, window, element, name):
+    def __long_screen_shot(self, window, element, name):
         print(window.size['height'])
         print(element.size['height'])
 
@@ -586,31 +586,26 @@ class Se_chicme():
             self.wd.execute_script(js)
             element.screenshot(name + '1.png')
 
-    def shotsSelectDescribe(self):
-
-
-            xp_size_button = '//*[@id="view-more-size"]/div/div[2]'
-            xp_detail_button = '//*[@id="description-open"]/div[2]'
-
+    def shotsSelectDescribe_pcms(self):
 
         if not self.msite:
             xp_sp_button = '//*[@id="openshipping"]'
             xp_sp = '/html/body/div[7]'
-            xp_sp_cls='/html/body/div[7]/span'
+            xp_sp_cls = '/html/body/div[7]/span'
             xp_rp_button = '//*[@id="openreturn"]'
             xp_rp = '/html/body/div[9]'
             xp_rp_cls = '/html/body/div[9]/span'
             xp_dp_button = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[2]/div[1]/span[2]'
             xp_dp = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[2]/div[2]/div'
             xp_dp_clo = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[2]/div[1]/span[2]'
-            xp_mp_button ='/html/body/div[3]/div[2]/div[2]/div/div[8]/div[1]/div[1]/span[2]'
+            xp_mp_button = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[1]/div[1]/span[2]'
             xp_mp = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[1]/div[2]'
             xp_mp_col = '/html/body/div[3]/div[2]/div[2]/div/div[8]/div[1]/div[1]/span[2]'
 
             try:
                 self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_sp_button)))
                 self.wd.find_element_by_xpath(xp_sp_button).click()
-                self.screen_shot('shipping', self.wd.find_element_by_xpath(xp_sp))
+                self.__screen_shot('shipping', self.wd.find_element_by_xpath(xp_sp))
                 self.wd.find_element_by_xpath(xp_sp_cls).click()
             except:
                 print('')
@@ -618,53 +613,51 @@ class Se_chicme():
             try:
                 self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_rp_button)))
                 self.wd.find_element_by_xpath(xp_rp_button).click()
-                self.screen_shot('return', self.wd.find_element_by_xpath(xp_rp))
+                self.__screen_shot('return', self.wd.find_element_by_xpath(xp_rp))
                 self.wd.find_element_by_xpath(xp_rp_cls).click()
             except:
                 print('')
 
             if xp_mp_button:
-                self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_mp_button)))
+                self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_mp_button)))
                 self.wd.find_element_by_xpath(xp_mp_button).click()
-                self.screen_shot('Model',self.wd.find_element_by_xpath(xp_mp))
+                self.__screen_shot('Model', self.wd.find_element_by_xpath(xp_mp))
                 self.wd.find_element_by_xpath(xp_mp_col).click()
             if xp_dp_button:
-                self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_dp_button)))
+                self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_dp_button)))
                 self.wd.find_element_by_xpath(xp_dp_button).click()
-                self.screen_shot('details',self.wd.find_element_by_xpath(xp_dp))
+                self.__screen_shot('details', self.wd.find_element_by_xpath(xp_dp))
                 self.wd.find_element_by_xpath(xp_dp_clo).click()
 
 
         else:
             xp_ship_iframe = '//iframe[@src="/fs/shipping-policy"]'
-            xp_ship_button='//*[@id="view-more-shipping"]/div/div[2]'
-            xp_ship='/html/body'
-            xp_return_iframe='//iframe[@src="/fs/return-policy"]'
-            xp_return_button='//*[@id="view-more-return"]/div/div[2]'
-            xp_return='/html/body'
+            xp_ship_button = '//*[@id="view-more-shipping"]/div/div[2]'
+            xp_ship = '/html/body'
+            xp_return_iframe = '//iframe[@src="/fs/return-policy"]'
+            xp_return_button = '//*[@id="view-more-return"]/div/div[2]'
+            xp_return = '/html/body'
             # xp_iframe_size = '//iframe[@src="/f/mobile/size?productId=7ecc313b-0d9f-456e-ab21-000a12c73ffb"]'
             # xp_size_button='//*[@id="view-more-size"]/div/div[2]'
-            xp_detail_button='//*[@id="description-open"]/div[2]'
-            xp_detail='//*[@id="description-fixed"]'
+            xp_detail_button = '//*[@id="description-open"]/div[2]'
+            xp_detail = '//*[@id="description-fixed"]'
 
             self.wd.find_element_by_xpath(xp_ship_button).click()
             frame = self.wd.find_element_by_xpath(xp_ship_iframe)
             self.wd.switch_to.frame(frame)
-            self.screen_shot(self.wd.find_element_by_xpath(xp_ship),'ship')
+            self.__screen_shot(self.wd.find_element_by_xpath(xp_ship), 'ship')
             self.wd.switch_to.default_content()
 
             self.wd.find_element_by_xpath(xp_return_button).click()
             frame = self.wd.find_element_by_xpath(xp_return_iframe)
             self.wd.switch_to.frame(frame)
-            self.screen_shot(self.wd.find_element_by_xpath(xp_return), 'return')
+            self.__screen_shot(self.wd.find_element_by_xpath(xp_return), 'return')
             self.wd.switch_to.default_content()
 
             self.wd.find_element_by_xpath(xp_detail_button).click()
-            self.screen_shot(self.wd.find_element_by_xpath(xp_detail), 'detail')
+            self.__screen_shot(self.wd.find_element_by_xpath(xp_detail), 'detail')
 
-
-
-    def shotEditAddress(self):
+    def shotEditAddress_pcms(self):
         xp_edit = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div/address/div[2]/span[2]/span[2]/span'
         xp_edit_ms = '//a[@href="/cart/address"]/span'
         xp_input = '//input[@name="unit"]'
@@ -684,7 +677,7 @@ class Se_chicme():
             self.wd.find_element_by_xpath(xp_save).click()
 
             self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_edit)))
-            self.screen_shot('address',self.wd.find_element_by_xpath(xp_address))
+            self.__screen_shot('address', self.wd.find_element_by_xpath(xp_address))
         else:
             self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_edit_ms)))
             self.wd.find_element_by_xpath(xp_edit_ms).click()
@@ -695,9 +688,9 @@ class Se_chicme():
             self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_submit_ms)))
             self.wd.find_element_by_xpath(xp_submit_ms).click()
 
-            self.screen_shot('address')
+            self.__screen_shot('address')
 
-    def shotsQtyForCoupon(self):
+    def shotsQtyForCoupon_pc(self):
         '''所有coupon优惠组合截图'''
         xp_unit_price = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[5]/div/span/span'
         xp_sum = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[4]/div[2]/div[2]/div/div/div/li/div/div[2]/div/div[6]/span'
@@ -708,39 +701,39 @@ class Se_chicme():
 
         if coupon_type is 'sum':
             for coupon in coupons:
+                self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_unit_price)))
                 unit_price = float(self.wd.find_element_by_xpath(xp_unit_price).text[1:])
                 sum = float(self.wd.find_element_by_xpath(xp_sum).text[1:])
                 qty_times = math.ceil((coupon - sum) / unit_price)
                 if qty_times <= 0:
                     qty_times -= 1
-                self.qty_items(qty_times)
-                self.screen_shot('coupon' + str(coupon))
+                self.__qty_items(qty_times)
+                self.__screen_shot('coupon' + str(coupon))
 
-    def find_element_by_xpath(self,xpath):
+    def find_element_by_xpath(self, xpath):
         try:
-            element=self.wd.find_element_by_xpath(xpath)
+            element = self.wd.find_element_by_xpath(xpath)
 
             element.screenshot('locate.png')
             return element
         except:
             return None
 
-
     def t(self):
-        xp_ex='//*[@id="i-navigation"]/ul/li[2]/a'
-        xp_item='//*[@id="filter-products"]/div[1]/figure/a/div/img'
-        xp_cart='//*[@id="addtocart"]'
-        xp_ship_i='//*[@id="openshipping"]'
-        xp_sp_st='/html/body/div[6]'
+        xp_ex = '//*[@id="i-navigation"]/ul/li[2]/a'
+        xp_item = '//*[@id="filter-products"]/div[1]/figure/a/div/img'
+        xp_cart = '//*[@id="addtocart"]'
+        xp_ship_i = '//*[@id="openshipping"]'
+        xp_sp_st = '/html/body/div[6]'
         # self.wd.find_element_by_xpath(xp_tc).click()
-        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_ex)))
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_ex)))
         self.wd.find_element_by_xpath(xp_ex).click()
-        self.wait.until(EC.element_to_be_clickable((By.XPATH,xp_item)))
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_item)))
         self.wd.find_element_by_xpath(xp_item).click()
         self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_cart)))
         self.wd.find_element_by_xpath(xp_cart).click()
         self.wd.find_element_by_xpath(xp_ship_i).click()
-        self.screen_shot('shipping')
+        self.__screen_shot('shipping')
         pass
 
 

@@ -12,6 +12,7 @@ import inspect
 import types
 from PIL import Image
 from PIL import ImageTk
+import re
 from time import sleep
 
 ch_group = {}
@@ -61,7 +62,23 @@ class Execer():
                 win.update()
                 exec(l)
                 ch_group[ls[0]] = names[ls[0]]
-            else:
+            elif '(' in l:
+                if not '.' in l:
+                    i = 0
+                    for e in map_currentChromes_name_rbutton:
+                        if v_currentChromes.get() == i:
+                            l = e + '.' + l
+                            break
+                        i += 1
+                ls = l.split('.')
+                param = l.split('(')
+                match = re.search(r'\.(.+)\(', l)
+                if match:
+                    fname = match.group(1)
+                for fun in map_function_name_button:
+                    if fun.startswith(fname):
+                        l = ls[0] + '.' + fun + '(' + param[1]
+                        break
                 exec(l)
 
         print('section over')
@@ -82,15 +99,15 @@ def b_run():
 def b_locate():
     global im
     global image
-    prefix=None
-    i = 0
+    prefix = None
     text_locate.set('正在定位。。。')
+    i = 0
     for e in map_currentChromes_name_rbutton:
         if v_currentChromes.get() == i:
             prefix = e
             break
         i += 1
-    element=ch_group[prefix].find_element_by_xpath(e_locate_xpath.get())
+    element = ch_group[prefix].find_element_by_xpath(e_locate_xpath.get())
     if element:
         text_locate.set('定位成功')
     else:
@@ -98,7 +115,7 @@ def b_locate():
         return
     image = Image.open("locate.png")
     im = ImageTk.PhotoImage(image)
-    c_locate.create_image(300, 300,image=im)
+    c_locate.create_image(300, 300, image=im)
 
     c_locate.pack()
     win.update()
@@ -147,6 +164,10 @@ def b_function(name):
 
 def b_save():
     map_section_name_value[csection] = textarea.get('1.0', tk.END)
+    with open('se-records.txt', 'w', encoding='UTF-8') as f:
+        js = json.dumps(map_section_name_value)
+        f.write(js)
+    messagebox.showinfo(message="save success")
 
 
 def b_reload():
@@ -247,9 +268,9 @@ lf_locate.pack(side=tk.LEFT, fill=tk.Y)
 
 e_locate_xpath = tk.Entry(lf_locate)
 b_locate_b = tk.Button(lf_locate, text='locate', command=b_locate)
-l_locate=tk.Label(lf_locate,textvariable=text_locate)
+l_locate = tk.Label(lf_locate, textvariable=text_locate)
 # text_locate.set('未找到')
-c_locate = tk.Canvas(lf_locate,height=600,width=600)
+c_locate = tk.Canvas(lf_locate, height=600, width=600)
 
 # image = Image.open("paypal.png")
 # im=ImageTk.PhotoImage(image)
