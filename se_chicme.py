@@ -312,7 +312,7 @@ class Se_chicme():
 
             self.__screen_shot('creditcard_msite')
 
-    def fillAddress_pcms(self):
+    def fillAddress_pc_ms(self):
         """
         填写购物车页下的地址具体信息
         无跳转
@@ -486,7 +486,7 @@ class Se_chicme():
         except:
             print('未完成支付')
 
-    def enterDetail_swORindex2itemDetail_pcms(self):
+    def enterDetail_swORindex2itemDetail_pc_ms(self):
         xp_trending = '//a[@data-type="Trending Now"]'
         xp_item = '//*[@id="filter-products"]/div[1]/figure/a/div/img'
 
@@ -501,10 +501,10 @@ class Se_chicme():
         else:
             self.wait.until(EC.element_to_be_clickable((By.XPATH, xp_item_ms)))
             element = self.wd.find_element_by_xpath(xp_item_ms)
-            self.wd.execute_script("arguments[0].scrollIntoView(true);", element)
+            # self.wd.execute_script("arguments[0].scrollIntoView(true);", element)
             element.click()
 
-    def enterItemPop_trendingORindex2itemPop_pcms(self):
+    def enterItemPop_trendingORindex2itemPop_pc_ms(self):
         xp_trending = '//a[@data-type="Trending Now"]'
         xp_item = '//*[@id="filter-products"]/div[1]/figure/a/div/img'
         xp_addchart = '//*[@id="filter-products"]/div[1]/figure/a/div/div[2]'
@@ -586,7 +586,7 @@ class Se_chicme():
             self.wd.execute_script(js)
             element.screenshot(name + '1.png')
 
-    def shotsSelectDescribe_pcms(self):
+    def shotsSelectDescribe_pc_ms(self):
 
         if not self.msite:
             xp_sp_button = '//*[@id="openshipping"]'
@@ -657,7 +657,7 @@ class Se_chicme():
             self.wd.find_element_by_xpath(xp_detail_button).click()
             self.__screen_shot(self.wd.find_element_by_xpath(xp_detail), 'detail')
 
-    def shotEditAddress_pcms(self):
+    def shotEditAddress_pc_ms(self):
         xp_edit = '//*[@id="root"]/div/div[2]/div/div/div[1]/div/div[1]/div/div[2]/div/div/div/address/div[2]/span[2]/span[2]/span'
         xp_edit_ms = '//a[@href="/cart/address"]/span'
         xp_input = '//input[@name="unit"]'
